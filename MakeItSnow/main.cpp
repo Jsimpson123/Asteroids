@@ -17,14 +17,9 @@ using namespace sf;
 #define winWidth 736
 #define winHeight 552
 
-struct position {
-    short x;
-    short y;
-};
 
 int main()
 {   
-   
 
     // Create the window
     RenderWindow window(VideoMode(winWidth, winHeight), "Asteroids!");
@@ -110,7 +105,19 @@ int main()
         }
 
         /* if (1 == Keyboard::isKeyPressed(Keyboard::Space)) {
-             bullets.push_back({})
+
+             for (int i = 0; i < bullets.size(); i++) {
+
+
+                 bullets.push_back((CircleShape{ static_cast<short>(10) , winHeight - 2 * 10 }));
+
+                 bullets.back().setPosition(rand() % winWidth, 50);
+
+                 // Allows the bullets to move up
+                 bullets[i].move(0, -1);
+
+                 window.draw(bullets[i]);
+             }
          } */
 
         // clear the window with black color
@@ -121,78 +128,88 @@ int main()
         window.draw(spr_spaceship);
         //window.draw(spr_asteroid);
 
-        float min = 10;
-        float max = 25;
-        // Constantly generates random numbers under 6 and sets snowSway to this, allowing the swaying motion
-        float snowSway = min + (rand() * (int)(max - min) / RAND_MAX);
 
-        // Adds a new element at the end of the vector, after its current last element
-        octagon.push_back(Sprite(spr_asteroid));
+            float min = 10;
+            float max = 25;
+            // Constantly generates random numbers under 6 and sets snowSway to this, allowing the swaying motion
+            float snowSway = min + (rand() * (int)(max - min) / RAND_MAX);
 
-        // Sets the next octagons in the vectors radius to less than 6
-       // octagon.back();
+            // Adds a new element at the end of the vector, after its current last element
+            octagon.push_back(Sprite(spr_asteroid));
 
-        bool collision = false;
+            // Sets the next octagons in the vectors radius to less than 6
+           // octagon.back();
 
-        int i = 0;
 
-        // Allows octagons to constantly fall
-        for (i; i < octagon.size(); i++)
-        {
-            // Allows the octagons to have the swaying motion 
-            octagon[i].rotate(rand() % 3);
 
-            // Makes sway smoother
-            snowSway *= -1;
-
-            // Sets the position of the next octagons randomly across the top of the screen
-            octagon.back().setPosition(rand() % winWidth, -50);
-
-            // Allows the octagons to move down
-            octagon[i].move(0, 1);
-
-            // Draws the octagons according to the positon of i
-
-            if (i % 100 == 0) {
-                window.draw(octagon[i]);
-
-            }
-            if (Collision::PixelPerfectTest(spr_spaceship, octagon[i])) {
-
-                cout << "Collision" << endl;
-                spr_spaceship.setColor(Color::Transparent);
-
-            }
-            else {
-                cout << "None" << endl;
-            }
-            
-
-           
-
-            if (octagon[i].getGlobalBounds().intersects(spr_spaceship.getGlobalBounds()))
+            // Allows octagons to constantly fall
+            for (int i = 0; i < octagon.size(); i++)
             {
-                // collision = true;
-                //spr_spaceship.setColor(Color::Transparent);
-                //cout << "1";
+                // Allows the octagons to have the swaying motion 
+                octagon[i].rotate(rand() % 3);
+
+                // Makes sway smoother
+                snowSway *= -1;
+
+                // Sets the position of the next octagons randomly across the top of the screen
+                octagon.back().setPosition(rand() % winWidth, -50);
+
+                // Allows the octagons to move down
+                octagon[i].move(0, 1);
+
+                // Draws the octagons according to the positon of i
+
+                if (i % 100 == 0) {
+                    window.draw(octagon[i]);
+
+                }
+                /*  if (Collision::PixelPerfectTest(spr_spaceship, octagon[i])) {
+
+                      cout << "Collision" << endl;
+                      spr_spaceship.setColor(Color::Transparent);
+
+                  }
+                  else {
+                      cout << "None" << endl;
+                  } */
+
+                if (spr_spaceship.getGlobalBounds().intersects(octagon[i].getGlobalBounds())) {
+                    //spr_spaceship.setColor(Color::Transparent);
+                    cout << "Collision" << endl;
+                }
+            }
+
+
+            float bulletSize = 6;
+
+            bullets.push_back(CircleShape());
+
+            // Sets the next bullets in the vectors radius 6
+            bullets.back().setRadius(bulletSize);
+
+            int i = 0;
+
+            // Allows bullets to constantly shoot
+            for (i; i < bullets.size(); i++)
+            {
+                if (i % 100 == 0) {
+                    // Sets the position of the next bullets to shoot from the ship
+                    bullets.back().setPosition(spr_spaceship.getPosition().x, spr_spaceship.getPosition().y);
+
+                    // Allows the bullets to move down
+
+                    bullets[i].setFillColor(sf::Color(0, 255, 0));
+
+                    window.draw(bullets[i]);
+                    bullets[i].move(0, -5);
+
+
+                }
 
             }
-            /*  else if (collision == false) {
-                  window.draw(spr_spaceship);
-              } */
+        
 
-        }
-
-        /*   if (spr_spaceship.getGlobalBounds().intersects(octagon[i].getGlobalBounds()))
-           {
-               bool collison = true;
-
-           }
-           else {
-               window.draw(octagon[i]);
-           } */
-
-         
+   
         // end the current frame
         window.display();
 
