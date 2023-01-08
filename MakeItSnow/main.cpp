@@ -1,5 +1,6 @@
 // A C++ SFML program with snowfall and a moving spaceship - Justin Simpson
 
+// Imports
 #include <iostream>  
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
@@ -16,14 +17,14 @@ using namespace sf;
 #define winWidth 736
 #define winHeight 552
 
-
 const int NUM_FRAMES = 8; // Number of frames in the explosion animation
 const int FRAME_WIDTH = 64; // Width of each frame in the explosion sprite sheet
 const int FRAME_HEIGHT = 64; // Height of each frame in the explosion sprite sheet
 
+// Function to display the Game Over screen
 void displayGameOverScreen(sf::RenderWindow& window)
 {
-
+	// Load font
 	Font font;
 	if (!font.loadFromFile("myFont.ttf")) {
 		std::cout << "Error loading font!" << std::endl;
@@ -32,9 +33,9 @@ void displayGameOverScreen(sf::RenderWindow& window)
 	// Clear the window to black
 	window.clear(Color::Black);
 
-	// Set the game over text
+	// Create the game over text
 	Text gameOverText;
-	gameOverText.setFont(font); // Set the font for the text
+	gameOverText.setFont(font); 
 	gameOverText.setString("Game Over!");
 	gameOverText.setCharacterSize(40);
 	gameOverText.setFillColor(sf::Color::Red);
@@ -63,9 +64,11 @@ void displayGameOverScreen(sf::RenderWindow& window)
 	}
 }
 
+// Function to display the Game Over screen
 void displayWinScreen(sf::RenderWindow& window)
 {
 
+	// Load font
 	Font font;
 	if (!font.loadFromFile("myFont.ttf")) {
 		std::cout << "Error loading font!" << std::endl;
@@ -74,20 +77,20 @@ void displayWinScreen(sf::RenderWindow& window)
 	// Clear the window to black
 	window.clear(Color::Black);
 
-	// Set the game over text
-	Text gameOverText;
-	gameOverText.setFont(font); // Set the font for the text
-	gameOverText.setString("You Won!");
-	gameOverText.setCharacterSize(40);
-	gameOverText.setFillColor(sf::Color::Blue);
-	gameOverText.setStyle(sf::Text::Bold);
+	// Create the You Won text
+	Text winText;
+	winText.setFont(font); 
+	winText.setString("You Won!");
+	winText.setCharacterSize(40);
+	winText.setFillColor(sf::Color::Blue);
+	winText.setStyle(sf::Text::Bold);
 
 	// Set the position of the texts
 	sf::Vector2u windowSize = window.getSize();
-	gameOverText.setPosition((windowSize.x - gameOverText.getLocalBounds().width) / 2, (windowSize.y - gameOverText.getLocalBounds().height) / 2);
+	winText.setPosition((windowSize.x - winText.getLocalBounds().width) / 2, (windowSize.y - winText.getLocalBounds().height) / 2);
 
 	// Draw the texts
-	window.draw(gameOverText);
+	window.draw(winText);
 
 	// Display the window
 	window.display();
@@ -109,6 +112,7 @@ void displayWinScreen(sf::RenderWindow& window)
 int main()
 {
 
+	// Defining the score and set it to 0
 	int score = 0;
 
 	// Create the window
@@ -221,60 +225,64 @@ int main()
 			spr_spaceship.move(0.0f, 4.0f);
 		}
 
+		// Used to ddetect the width and height of the spaceship
 		sf::Vector2f spaceshipPos = spr_spaceship.getPosition();
 		const float spaceshipWidth = spr_spaceship.getGlobalBounds().width;
 		const float spaceshipHeight = spr_spaceship.getGlobalBounds().height;
+		
+		// Check if the spaceship is outside the left side of the screen
 		if (spaceshipPos.x < 0) {
 			spr_spaceship.setPosition(0, spaceshipPos.y);
-		}
+		} 
 
 		// Check if the spaceship is outside the right side of the screen
 		if (spaceshipPos.x + spaceshipWidth > winWidth) {
 			spr_spaceship.setPosition(winWidth - spaceshipWidth, spr_spaceship.getPosition().y);
 		}
 
+		// Check if the spaceship is outside the top side of the screen
 		if (spaceshipPos.y < 0) {
 			spr_spaceship.setPosition(spaceshipPos.x, 0);
-		}
+		} 
 
-		// Check if the spaceship is outside the right side of the screen
+		// Check if the spaceship is outside the bottom side of the screen
 		if (spaceshipPos.y + spaceshipHeight > winHeight) {
 			spr_spaceship.setPosition(spr_spaceship.getPosition().x, winHeight - spaceshipHeight);
-		}
+		} 
 	
 		 // clear the window with black color
 		window.clear(Color::Black);
 
 		// Draw everything here...
 		window.draw(spr_background);
-		window.draw(*Selected_Piece);
-		//window.draw(spr_asteroid);
+		window.draw(spr_spaceship);
 
-
+		// Set the min and max
 		float min = 10;
 		float max = 25;
 
 		// Adds a new element at the end of the vector, after its current last element
 		octagon.push_back(Sprite(spr_asteroid));
 
-
+		// Used to generate random numbers between 0.1 and 0.3
 		float size = 0.1 + (rand() / (float)RAND_MAX) * 0.2;
 
 		// Sets the next octagons in the vectors radius to less than 6
 		octagon.back().setScale(size, size);
 
-		float bulletSize = 6;
+		// Set lastBullet to -1
+		int lastBullet = -1;
 
-		int lastBulletIndex = -1;
-
+		// Adds a new element at the end of the vector, after its current last element
 		bullets.push_back(Sprite(spr_bullet));
-
-
 
 		// Allows octagons to constantly fall
 		for (size_t i = 0; i < octagon.size(); i++)
 		{
+			// set removed to 0
 			size_t removed = 0;
+
+			// A while loop to remove asteroids to prevent them from all coming down at once
 			while (octagon.size() - removed > 75)
 			{
 				// Remove a quarter of the octagons from the vector
@@ -291,48 +299,41 @@ int main()
 			// Allows the octagons to move down
 			octagon[i].move(0, 1);
 
+			// If asteroids exit the bottom of the screen, remove them
 			if (octagon[i].getPosition().y > winHeight + 50) {
+				
 				// Remove the octagon from the vector
 				octagon.erase(octagon.begin() + i);
-
 			}
 
 			// Draws the octagons according to the positon of i
 			window.draw(octagon[i]);
 
-
-
-		
-	
-		
-		
-
-
 			// Allows bullets to constantly shoot
-			for (size_t j = lastBulletIndex + 1; j < bullets.size(); j++)
+			for (size_t j = lastBullet + 1; j < bullets.size(); j++)
 			{
 					// Sets the position of the next bullets to shoot from the ship
 					bullets.back().setPosition(spr_spaceship.getPosition().x + 45, spr_spaceship.getPosition().y);
 
 					// Draws the bullets according to j and allows the bullets to move
-
 					window.draw(bullets[j]);
 					bullets[j].move(0, -4);
-
+				
+				// If a bullet collides with an asteroid
 				if (Collision::PixelPerfectTest(bullets[j], octagon[i])) {
-
-					cout << "BulletCollision" << endl;
 
 					// Add a new scrap metal sprite to the vector
 					scrapMetal.push_back(Sprite(spr_scrapMetal));
 					// Set the position of the scrap metal sprite to the position of the destroyed octagon
 					scrapMetal.back().setPosition(octagon[i].getPosition());
 
+					// Erase an asteroid once destroyed and decrement
 					octagon.erase(octagon.begin() + i);
 					j--;
 
 				}
 
+				// Remove bullets if they exit the screen (prevents lag)
 				bullets.erase(std::remove_if(bullets.begin(), bullets.end(),
 					[&](const sf::Sprite& spr_bullet)
 					{
@@ -342,39 +343,38 @@ int main()
 							spritePosition.x < 0 || spritePosition.y < 0;
 					}), bullets.end()); 
 
-			
-
-
+				// If spaceship collides with an asteroid
 				if (Collision::PixelPerfectTest(spr_spaceship, octagon[i])) {
 
-					cout << "Collision" << endl;
-					//spr_spaceship.setColor(Color::Transparent);
-					//delete &Selected_Piece;
-
+					// Displays game over screen
 					displayGameOverScreen(window);
-
 				}
 			}
 		}
 
-		lastBulletIndex = bullets.size() - 1; // Update the index of the last bullet added to the game
+		// Update the index of the last bullet added to the game
+		lastBullet = bullets.size() - 1;
 
+		// Creats pieces of scrap metal
 		for (int i = 0; i < scrapMetal.size(); i++) {
-			scrapMetal[i].move(0, 2); // Move the scrap metal downwards
+			
+			// Move the scrap metal downwards and draws it
+			scrapMetal[i].move(0, 2); 
 			window.draw(scrapMetal[i]);
 
 			// Check for a collision between the spaceship and the scrap metal
 			if (Collision::PixelPerfectTest(spr_spaceship, scrapMetal[i])) {
 
-				score++; // Increment the score
-				cout << "Scrap metal collected!" << endl;
+				// Increment the score
+				score++; 
 
-				// Remove the scrap metal from the game
+				// Remove the scrap metal from the game and decrement
 				scrapMetal.erase(scrapMetal.begin() + i);
 				i--;
 			}
 		}
 
+		// If the score reaches 50, Display the Win screen
 		if (score == 50) {
 
 			displayWinScreen(window);
