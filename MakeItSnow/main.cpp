@@ -108,7 +108,6 @@ void displayWinScreen(sf::RenderWindow& window)
 	}
 }
 
-
 int main()
 {
 
@@ -123,22 +122,14 @@ int main()
 
 	// Texture set up
 	Texture tex_background, tex_spaceship, tex_asteroid, tex_bullet, tex_scrapMetal, explosionTexture;
-	tex_background.loadFromFile("winter_night.jpg");
+	tex_background.loadFromFile("stars.png");
 	tex_spaceship.loadFromFile("spaceship.png");
 	tex_asteroid.loadFromFile("asteroid.png");
 	tex_bullet.loadFromFile("bullet.png");
 	tex_scrapMetal.loadFromFile("scrapMetal.png");
-	explosionTexture.loadFromFile("explosion.png");
-
 
 	// Set up each sprite (Position, scale etc.)
 	Sprite spr_background, spr_asteroid, spr_bullet, spr_spaceship, spr_scrapMetal, explosionSprite;
-
-	
-	Sprite* Selected_Piece;
-	Selected_Piece = &spr_spaceship;
-
-
 
 	spr_background.setTexture(tex_background);
 
@@ -162,16 +153,34 @@ int main()
 
 	// Create a clock to track the elapsed time for the animation
 	Clock clock;
-
-
-	Font font;
-	if (!font.loadFromFile("myFont.ttf")) {
-		std::cout << "Error loading font!" << std::endl;
+		
+	// Set up explosion sound
+	SoundBuffer buffer;
+	if (!buffer.loadFromFile("explosion.wav")) {
+		// Error loading sound file
 	}
 
-	// Set up CircleShape vector
+	Sound explosionSound;
+	explosionSound.setBuffer(buffer);
 
-	vector<Sprite> octagon;
+	// Set up dead sound
+	SoundBuffer buffer1;
+	if (!buffer1.loadFromFile("dead.wav")) {
+		// Error loading sound file
+	}
+
+	Sound dead;
+	dead.setBuffer(buffer1);
+
+
+	// Set up custom font
+	Font font;
+	if (!font.loadFromFile("myFont.ttf")) {
+		cout << "Error loading font!" << endl;
+	}
+
+	// Set up sprite vectors
+	vector<Sprite> asteroid;
 	vector<Sprite> bullets;
 	vector<Sprite> scrapMetal;
 
@@ -195,37 +204,31 @@ int main()
 
 		window.clear();
 
-		// spaceship moves left when left key is pressed and is set to a certain scale
+		// Spaceship moves left when left key is pressed
 		if (Keyboard::isKeyPressed(Keyboard::Left))
 		{
-			//spr_spaceship.setScale(0.15f, 0.15f);
-			//spr_spaceship.move(-4.0f, 0.0f);
 			spr_spaceship.setPosition(spr_spaceship.getPosition().x - 4, spr_spaceship.getPosition().y);
 		}
 
-		// spaceship moves right when right key is pressed and is set to a certain scale
+		// Spaceship moves right when right key
 		if (Keyboard::isKeyPressed(Keyboard::Right))
 		{
-			//spr_spaceship.setScale(-0.15f, 0.15f);
-			//spr_spaceship.move(4.0f, 0.0f);
 			spr_spaceship.setPosition(spr_spaceship.getPosition().x + 4, spr_spaceship.getPosition().y);
 		}
 
-		// spaceship moves up when up key is pressed and is set to a certain scale
+		// Spaceship moves up when up key is pressed
 		if (Keyboard::isKeyPressed(Keyboard::Up))
 		{
-			//spr_spaceship.setScale(-0.15f, 0.15f);
 			spr_spaceship.move(0.0f, -4.0f);
 		}
 
-		// spaceship moves down when down key is pressed and is set to a certain scale
+		// Spaceship moves down when down key is pressed
 		if (Keyboard::isKeyPressed(Keyboard::Down))
 		{
-			//spr_spaceship.setScale(-0.15f, 0.15f);
 			spr_spaceship.move(0.0f, 4.0f);
 		}
 
-		// Used to ddetect the width and height of the spaceship
+		// Used to detect the width and height of the spaceship
 		sf::Vector2f spaceshipPos = spr_spaceship.getPosition();
 		const float spaceshipWidth = spr_spaceship.getGlobalBounds().width;
 		const float spaceshipHeight = spr_spaceship.getGlobalBounds().height;
@@ -262,13 +265,13 @@ int main()
 		float max = 25;
 
 		// Adds a new element at the end of the vector, after its current last element
-		octagon.push_back(Sprite(spr_asteroid));
+		asteroid.push_back(Sprite(spr_asteroid));
 
 		// Used to generate random numbers between 0.1 and 0.3
 		float size = 0.1 + (rand() / (float)RAND_MAX) * 0.2;
 
-		// Sets the next octagons in the vectors radius to less than 6
-		octagon.back().setScale(size, size);
+		// Sets the next asteroids in the vectors radius to less than 6
+		asteroid.back().setScale(size, size);
 
 		// Set lastBullet to -1
 		int lastBullet = -1;
@@ -276,61 +279,64 @@ int main()
 		// Adds a new element at the end of the vector, after its current last element
 		bullets.push_back(Sprite(spr_bullet));
 
-		// Allows octagons to constantly fall
-		for (size_t i = 0; i < octagon.size(); i++)
+		// Allows asteroids to constantly fall
+		for (size_t i = 0; i < asteroid.size(); i++)
 		{
 			// set removed to 0
 			size_t removed = 0;
 
 			// A while loop to remove asteroids to prevent them from all coming down at once
-			while (octagon.size() - removed > 75)
+			while (asteroid.size() - removed > 75)
 			{
-				// Remove a quarter of the octagons from the vector
-				octagon.erase(octagon.begin() + octagon.size() / 4, octagon.end());
-				removed += octagon.size() / 4;
+				// Remove a quarter of the asteroids from the vector
+				asteroid.erase(asteroid.begin() + asteroid.size() / 4, asteroid.end());
+				removed += asteroid.size() / 4;
 			}
 
-			// Allows the octagons to have the swaying motion 
-			octagon[i].rotate(rand() % 3);
+			// Allows the asteroids to have the swaying motion 
+			asteroid[i].rotate(rand() % 3);
 
-			// Sets the position of the next octagons randomly across the top of the screen
-			octagon.back().setPosition(rand() % winWidth, -200);
+			// Sets the position of the next asteroids randomly across the top of the screen
+			asteroid.back().setPosition(rand() % winWidth, -200);
 
-			// Allows the octagons to move down
-			octagon[i].move(0, 1);
+			// Allows the asteroids to move down
+			asteroid[i].move(0, 1);
 
 			// If asteroids exit the bottom of the screen, remove them
-			if (octagon[i].getPosition().y > winHeight + 50) {
+			if (asteroid[i].getPosition().y > winHeight + 50) {
 				
-				// Remove the octagon from the vector
-				octagon.erase(octagon.begin() + i);
+				// Remove the asteroid from the vector
+				asteroid.erase(asteroid.begin() + i);
 			}
 
-			// Draws the octagons according to the positon of i
-			window.draw(octagon[i]);
+			// Draws the asteroids according to the positon of i
+			window.draw(asteroid[i]);
 
 			// Allows bullets to constantly shoot
 			for (size_t j = lastBullet + 1; j < bullets.size(); j++)
 			{
 					// Sets the position of the next bullets to shoot from the ship
-					bullets.back().setPosition(spr_spaceship.getPosition().x + 45, spr_spaceship.getPosition().y);
+					bullets.back().setPosition(spr_spaceship.getPosition().x + 43, spr_spaceship.getPosition().y);
 
 					// Draws the bullets according to j and allows the bullets to move
 					window.draw(bullets[j]);
 					bullets[j].move(0, -4);
 				
 				// If a bullet collides with an asteroid
-				if (Collision::PixelPerfectTest(bullets[j], octagon[i])) {
+				if (Collision::PixelPerfectTest(bullets[j], asteroid[i])) {
 
 					// Add a new scrap metal sprite to the vector
 					scrapMetal.push_back(Sprite(spr_scrapMetal));
-					// Set the position of the scrap metal sprite to the position of the destroyed octagon
-					scrapMetal.back().setPosition(octagon[i].getPosition());
+					
+					// Set the position of the scrap metal sprite to the position of the destroyed asteroid
+					scrapMetal.back().setPosition(asteroid[i].getPosition());
+					
+					// Play the explosion sound
+					explosionSound.play();
 
 					// Erase an asteroid once destroyed and decrement
-					octagon.erase(octagon.begin() + i);
+					asteroid.erase(asteroid.begin() + i);
 					j--;
-
 				}
 
 				// Remove bullets if they exit the screen (prevents lag)
@@ -344,7 +350,9 @@ int main()
 					}), bullets.end()); 
 
 				// If spaceship collides with an asteroid
-				if (Collision::PixelPerfectTest(spr_spaceship, octagon[i])) {
+				if (Collision::PixelPerfectTest(spr_spaceship, asteroid[i])) {
+
+					dead.play();
 
 					// Displays game over screen
 					displayGameOverScreen(window);
@@ -355,7 +363,7 @@ int main()
 		// Update the index of the last bullet added to the game
 		lastBullet = bullets.size() - 1;
 
-		// Creats pieces of scrap metal
+		// Creates pieces of scrap metal
 		for (int i = 0; i < scrapMetal.size(); i++) {
 			
 			// Move the scrap metal downwards and draws it
@@ -380,9 +388,7 @@ int main()
 			displayWinScreen(window);
 		
 		}
-
-
-		
+	
 		// Display the score on the screen
 		sf::Text text;
 		text.setFont(font); // Set the font for the text
