@@ -153,7 +153,6 @@
   <ItemGroup>
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Collision.hpp" />

@@ -51,13 +51,12 @@ void displayGameOverScreen(sf::RenderWindow& window)
 	// Display the window
 	window.display();
 
-	// Wait for the player to press space
 	while (true)
 	{
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
-			// "close requested" event: we close the window
+			// Closes the window
 			if (event.type == Event::Closed)
 				window.close();
 		}
@@ -108,10 +107,9 @@ void displayWinScreen(sf::RenderWindow& window)
 	}
 }
 
-int main()
-{
+void Asteroids() {
 
-	// Defining the score and set it to 0
+	// Defining the score and setting it to 0
 	int score = 0;
 
 	// Create the window
@@ -153,7 +151,7 @@ int main()
 
 	// Create a clock to track the elapsed time for the animation
 	Clock clock;
-		
+
 	// Set up explosion sound
 	SoundBuffer buffer;
 	if (!buffer.loadFromFile("explosion.wav")) {
@@ -232,11 +230,11 @@ int main()
 		sf::Vector2f spaceshipPos = spr_spaceship.getPosition();
 		const float spaceshipWidth = spr_spaceship.getGlobalBounds().width;
 		const float spaceshipHeight = spr_spaceship.getGlobalBounds().height;
-		
+
 		// Check if the spaceship is outside the left side of the screen
 		if (spaceshipPos.x < 0) {
 			spr_spaceship.setPosition(0, spaceshipPos.y);
-		} 
+		}
 
 		// Check if the spaceship is outside the right side of the screen
 		if (spaceshipPos.x + spaceshipWidth > winWidth) {
@@ -246,14 +244,14 @@ int main()
 		// Check if the spaceship is outside the top side of the screen
 		if (spaceshipPos.y < 0) {
 			spr_spaceship.setPosition(spaceshipPos.x, 0);
-		} 
+		}
 
 		// Check if the spaceship is outside the bottom side of the screen
 		if (spaceshipPos.y + spaceshipHeight > winHeight) {
 			spr_spaceship.setPosition(spr_spaceship.getPosition().x, winHeight - spaceshipHeight);
-		} 
-	
-		 // clear the window with black color
+		}
+
+		// clear the window with black color
 		window.clear(Color::Black);
 
 		// Draw everything here...
@@ -304,7 +302,7 @@ int main()
 
 			// If asteroids exit the bottom of the screen, remove them
 			if (asteroid[i].getPosition().y > winHeight + 50) {
-				
+
 				// Remove the asteroid from the vector
 				asteroid.erase(asteroid.begin() + i);
 			}
@@ -315,22 +313,22 @@ int main()
 			// Allows bullets to constantly shoot
 			for (size_t j = lastBullet + 1; j < bullets.size(); j++)
 			{
-					// Sets the position of the next bullets to shoot from the ship
-					bullets.back().setPosition(spr_spaceship.getPosition().x + 43, spr_spaceship.getPosition().y);
+				// Sets the position of the next bullets to shoot from the ship
+				bullets.back().setPosition(spr_spaceship.getPosition().x + 43, spr_spaceship.getPosition().y);
 
-					// Draws the bullets according to j and allows the bullets to move
-					window.draw(bullets[j]);
-					bullets[j].move(0, -4);
-				
+				// Draws the bullets according to j and allows the bullets to move
+				window.draw(bullets[j]);
+				bullets[j].move(0, -4);
+
 				// If a bullet collides with an asteroid
 				if (Collision::PixelPerfectTest(bullets[j], asteroid[i])) {
 
 					// Add a new scrap metal sprite to the vector
 					scrapMetal.push_back(Sprite(spr_scrapMetal));
-					
+
 					// Set the position of the scrap metal sprite to the position of the destroyed asteroid
 					scrapMetal.back().setPosition(asteroid[i].getPosition());
-					
+
 					// Play the explosion sound
 					explosionSound.play();
 
@@ -347,7 +345,7 @@ int main()
 						sf::Vector2f spritePosition = spr_bullet.getPosition();
 						return spritePosition.x > screenSize.x || spritePosition.y > screenSize.y ||
 							spritePosition.x < 0 || spritePosition.y < 0;
-					}), bullets.end()); 
+					}), bullets.end());
 
 				// If spaceship collides with an asteroid
 				if (Collision::PixelPerfectTest(spr_spaceship, asteroid[i])) {
@@ -365,16 +363,16 @@ int main()
 
 		// Creates pieces of scrap metal
 		for (int i = 0; i < scrapMetal.size(); i++) {
-			
+
 			// Move the scrap metal downwards and draws it
-			scrapMetal[i].move(0, 2); 
+			scrapMetal[i].move(0, 2);
 			window.draw(scrapMetal[i]);
 
 			// Check for a collision between the spaceship and the scrap metal
 			if (Collision::PixelPerfectTest(spr_spaceship, scrapMetal[i])) {
 
 				// Increment the score
-				score++; 
+				score++;
 
 				// Remove the scrap metal from the game and decrement
 				scrapMetal.erase(scrapMetal.begin() + i);
@@ -386,9 +384,9 @@ int main()
 		if (score == 50) {
 
 			displayWinScreen(window);
-		
+
 		}
-	
+
 		// Display the score on the screen
 		sf::Text text;
 		text.setFont(font); // Set the font for the text
@@ -396,12 +394,19 @@ int main()
 		text.setCharacterSize(45.0f); // Set the character size
 		text.setFillColor(sf::Color::Black); // Set the text color
 		window.draw(text); // Draw the text on the screen
-	
+
 
 		// end the current frame
 		window.display();
 
 		elapsedTime = clock.getElapsedTime();
 	}
+
+}
+
+int main()
+{
+	Asteroids();
+	
 	return 0;
 }
