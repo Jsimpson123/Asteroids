@@ -1,4 +1,4 @@
-// A C++ SFML program with snowfall and a moving spaceship - Justin Simpson
+// A C++ SFML program with falling asteroids and a moving spaceship - Justin Simpson
 
 // Imports
 #include <iostream>  
@@ -169,6 +169,15 @@ void Asteroids() {
 
 	Sound dead;
 	dead.setBuffer(buffer1);
+
+	// Set up metal sound
+	SoundBuffer buffer2;
+	if (!buffer2.loadFromFile("metal.wav")) {
+		// Error loading sound file
+	}
+
+	Sound metal;
+	metal.setBuffer(buffer2);
 
 
 	// Set up custom font
@@ -374,6 +383,8 @@ void Asteroids() {
 				// Increment the score
 				score++;
 
+				metal.play();
+
 				// Remove the scrap metal from the game and decrement
 				scrapMetal.erase(scrapMetal.begin() + i);
 				i--;
@@ -401,7 +412,6 @@ void Asteroids() {
 
 		elapsedTime = clock.getElapsedTime();
 	}
-
 }
 
 int main()
